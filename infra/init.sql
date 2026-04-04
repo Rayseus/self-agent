@@ -1,4 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 CREATE TABLE IF NOT EXISTS documents (
   id SERIAL PRIMARY KEY,
@@ -18,8 +19,11 @@ CREATE TABLE IF NOT EXISTS chunks (
 CREATE TABLE IF NOT EXISTS embeddings (
   id SERIAL PRIMARY KEY,
   chunk_id INT REFERENCES chunks(id) ON DELETE CASCADE,
-  embedding VECTOR(1024)
+  embedding VECTOR(3072)
 );
+
+CREATE INDEX IF NOT EXISTS idx_embeddings_vector ON embeddings USING ivfflat (embedding vector_cosine_ops) WITH (lists = 10);
+CREATE INDEX IF NOT EXISTS idx_chunks_trgm ON chunks USING gin (chunk_text gin_trgm_ops);
 
 CREATE TABLE IF NOT EXISTS qa_logs (
   id SERIAL PRIMARY KEY,

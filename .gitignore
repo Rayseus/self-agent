@@ -1,6 +1,6 @@
 # Python
-backend/.venv/
-backend/__pycache__/
+.venv/
+__pycache__/
 backend/.pytest_cache/
 
 # Node
@@ -15,3 +15,4 @@ backend/.env
 
 # Prompt
 pd.md
+temp.md
