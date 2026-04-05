@@ -1,16 +1,16 @@
 services:
   postgres:
     image: pgvector/pgvector:pg16
-    container_name: seft-agent-postgres
+    container_name: self-agent-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: seft_agent
+      POSTGRES_DB: self_agent
     ports:
       - "5432:5432"
     volumes:
-      - seft-agent-pgdata:/var/lib/postgresql/data
+      - self-agent-pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
-  seft-agent-pgdata:
+  self-agent-pgdata:

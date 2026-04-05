@@ -1,0 +1,282 @@
+[
+  {
+    "id": 1,
+    "question": "你擅长什么技术？",
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["RAG", "全栈"]
+  },
+  {
+    "id": 2,
+    "question": "你的核心技术方向是什么？",
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["检索增强生成", "LLM"]
+  },
+  {
+    "id": 3,
+    "question": "你会用哪些前端框架？",
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["React"]
+  },
+  {
+    "id": 4,
+    "question": "你用什么后端框架？",
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["FastAPI"]
+  },
+  {
+    "id": 5,
+    "question": "你用过什么数据库？",
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["PostgreSQL", "pgvector"]
+  },
+  {
+    "id": 6,
+    "question": "你的技术栈有哪些？",
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["FastAPI", "React", "PostgreSQL"]
+  },
+  {
+    "id": 7,
+    "question": "你有 Prompt Engineering 经验吗？",
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["Prompt"]
+  },
+  {
+    "id": 8,
+    "question": "你关注哪些技术指标？",
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["准确率", "可解释性"]
+  },
+  {
+    "id": 9,
+    "question": "你对全栈工程化有经验吗？",
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["全栈"]
+  },
+  {
+    "id": 10,
+    "question": "你会向量检索吗？",
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["pgvector"]
+  },
+  {
+    "id": 11,
+    "question": "你做过哪些项目？",
+    "category": "project",
+    "expected_type": "answer",
+    "expected_keywords": ["Agent", "问答"]
+  },
+  {
+    "id": 12,
+    "question": "你做过 RAG 相关项目吗？",
+    "category": "project",
+    "expected_type": "answer",
+    "expected_keywords": ["RAG"]
+  },
+  {
+    "id": 13,
+    "question": "你的项目重点优化了什么？",
+    "category": "project",
+    "expected_type": "answer",
+    "expected_keywords": ["召回", "准确率"]
+  },
+  {
+    "id": 14,
+    "question": "你做过个人介绍相关的项目吗？",
+    "category": "project",
+    "expected_type": "answer",
+    "expected_keywords": ["个人介绍", "履历"]
+  },
+  {
+    "id": 15,
+    "question": "你做过哪些和 LLM 应用落地相关的事？",
+    "category": "project",
+    "expected_type": "answer",
+    "expected_keywords": ["LLM", "落地"]
+  },
+  {
+    "id": 16,
+    "question": "你的项目如何保证回答的可信度？",
+    "category": "project",
+    "expected_type": "answer",
+    "expected_keywords": ["可信度"]
+  },
+  {
+    "id": 17,
+    "question": "你的 RAG 项目包含哪些环节？",
+    "category": "project",
+    "expected_type": "answer",
+    "expected_keywords": ["文档", "检索"]
+  },
+  {
+    "id": 18,
+    "question": "你做过文档建库的工作吗？",
+    "category": "project",
+    "expected_type": "answer",
+    "expected_keywords": ["文档"]
+  },
+  {
+    "id": 19,
+    "question": "你擅长什么？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["RAG", "全链路"]
+  },
+  {
+    "id": 20,
+    "question": "你做过哪些相关项目？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["Agent", "问答"]
+  },
+  {
+    "id": 21,
+    "question": "你的角色是什么？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["RAG", "工程师"]
+  },
+  {
+    "id": 22,
+    "question": "你能从文档建库到前后端交付吗？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["文档", "交付"]
+  },
+  {
+    "id": 23,
+    "question": "你会弹钢琴吗？",
+    "category": "boundary",
+    "expected_type": "refuse",
+    "expected_keywords": []
+  },
+  {
+    "id": 24,
+    "question": "你喜欢吃什么菜？",
+    "category": "boundary",
+    "expected_type": "refuse",
+    "expected_keywords": []
+  },
+  {
+    "id": 25,
+    "question": "今天天气怎么样？",
+    "category": "boundary",
+    "expected_type": "refuse",
+    "expected_keywords": []
+  },
+  {
+    "id": 26,
+    "question": "帮我写一个排序算法",
+    "category": "boundary",
+    "expected_type": "refuse",
+    "expected_keywords": []
+  },
+  {
+    "id": 27,
+    "question": "你的年薪是多少？",
+    "category": "boundary",
+    "expected_type": "refuse",
+    "expected_keywords": []
+  },
+  {
+    "id": 28,
+    "question": "你住在哪个城市？",
+    "category": "boundary",
+    "expected_type": "refuse",
+    "expected_keywords": []
+  },
+  {
+    "id": 29,
+    "question": "你有女朋友吗？",
+    "category": "boundary",
+    "expected_type": "refuse",
+    "expected_keywords": []
+  },
+  {
+    "id": 30,
+    "question": "你对区块链怎么看？",
+    "category": "boundary",
+    "expected_type": "refuse",
+    "expected_keywords": []
+  },
+  {
+    "id": 31,
+    "question": "你参加过 ACM 竞赛吗？",
+    "category": "boundary",
+    "expected_type": "refuse",
+    "expected_keywords": []
+  },
+  {
+    "id": 32,
+    "question": "帮我翻译一段英文",
+    "category": "boundary",
+    "expected_type": "refuse",
+    "expected_keywords": []
+  },
+  {
+    "id": 33,
+    "question": "你会游泳吗？",
+    "category": "boundary",
+    "expected_type": "refuse",
+    "expected_keywords": []
+  },
+  {
+    "id": 34,
+    "question": "你有几年工作经验？",
+    "category": "boundary",
+    "expected_type": "refuse",
+    "expected_keywords": []
+  },
+  {
+    "id": 35,
+    "question": "你会检索优化吗？",
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["检索"]
+  },
+  {
+    "id": 36,
+    "question": "你有 Prompt 约束方面的能力吗？",
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["Prompt"]
+  },
+  {
+    "id": 37,
+    "question": "你能做前后端交付吗？",
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["前后端", "交付"]
+  },
+  {
+    "id": 38,
+    "question": "你关注回答的可迭代优化吗？",
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["可迭代", "优化"]
+  },
+  {
+    "id": 39,
+    "question": "你有没有做过和学历相关的项目？",
+    "category": "boundary",
+    "expected_type": "refuse",
+    "expected_keywords": []
+  },
+  {
+    "id": 40,
+    "question": "你会 Java 吗？",
+    "category": "boundary",
+    "expected_type": "refuse",
+    "expected_keywords": []
+  }
+]

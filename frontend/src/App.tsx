@@ -29,7 +29,7 @@ function App() {
 
   return (
     <main className="container">
-      <h1>Seft-Agent</h1>
+      <h1>Self-Agent</h1>
       <p className="desc">基于个人简历与项目经验的 RAG 问答助手</p>
 
       <form onSubmit={onSubmit} className="card">

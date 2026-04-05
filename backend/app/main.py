@@ -1,11 +1,16 @@
+import logging
 from uuid import uuid4
 
-from fastapi import FastAPI
+from fastapi import BackgroundTasks, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.db import SessionLocal
+from app.models import QALog
 from app.schemas import ChatRequest, ChatResponse
 from app.services.rag_service import RAGService
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title=settings.app_name)
 rag_service = RAGService()
@@ -19,12 +24,54 @@ app.add_middleware(
 )
 
 
+def _save_qa_log(
+    question: str,
+    answer: str,
+    trace_id: str,
+    latency_ms: float,
+    hit_chunks: list[dict],
+    retrieval_scores: list[float],
+) -> None:
+    session = SessionLocal()
+    try:
+        session.add(
+            QALog(
+                question=question,
+                answer=answer,
+                trace_id=trace_id,
+                latency_ms=latency_ms,
+                hit_chunks=hit_chunks,
+                retrieval_scores=retrieval_scores,
+            )
+        )
+        session.commit()
+    except Exception:
+        session.rollback()
+        logger.exception("qa_log write failed trace=%s", trace_id)
+    finally:
+        session.close()
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "env": settings.app_env}
 
 
 @app.post("/api/chat", response_model=ChatResponse)
-def chat(req: ChatRequest) -> ChatResponse:
-    answer, citations = rag_service.answer(req.question)
-    return ChatResponse(answer=answer, citations=citations, trace_id=str(uuid4()))
+def chat(req: ChatRequest, bg: BackgroundTasks) -> ChatResponse:
+    trace_id = str(uuid4())
+    result = rag_service.answer(req.question)
+    logger.info(
+        "trace=%s latency=%.1fms citations=%d",
+        trace_id, result.latency_ms, len(result.citations),
+    )
+    bg.add_task(
+        _save_qa_log,
+        question=req.question,
+        answer=result.answer,
+        trace_id=trace_id,
+        latency_ms=result.latency_ms,
+        hit_chunks=result.hit_chunks,
+        retrieval_scores=result.retrieval_scores,
+    )
+    return ChatResponse(answer=result.answer, citations=result.citations, trace_id=trace_id)

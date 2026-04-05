@@ -1,4 +1,4 @@
-# Seft-Agent 架构设计（RAG 全栈）
+# Self-Agent 架构设计（RAG 全栈）
 
 ## 1. 目标与范围
 
@@ -26,7 +26,7 @@ Web(React/Vite)
 ## 3. 目录设计
 
 ```text
-Seft-Agent/
+Self-Agent/
   docs/
     architecture.md
   data/

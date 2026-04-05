@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS embeddings (
   embedding VECTOR(3072)
 );
 
-CREATE INDEX IF NOT EXISTS idx_embeddings_vector ON embeddings USING ivfflat (embedding vector_cosine_ops) WITH (lists = 10);
+-- 向量索引：pgvector 默认编译限制 2000 维，3072 维暂用顺序扫描；数据量增大后可降维或升级 pgvector
+-- CREATE INDEX IF NOT EXISTS idx_embeddings_vector ON embeddings USING hnsw (embedding vector_cosine_ops);
 CREATE INDEX IF NOT EXISTS idx_chunks_trgm ON chunks USING gin (chunk_text gin_trgm_ops);
 
 CREATE TABLE IF NOT EXISTS qa_logs (
@@ -30,5 +31,8 @@ CREATE TABLE IF NOT EXISTS qa_logs (
   question TEXT NOT NULL,
   answer TEXT NOT NULL,
   trace_id VARCHAR(64) NOT NULL,
+  latency_ms DOUBLE PRECISION,
+  hit_chunks JSONB,
+  retrieval_scores JSONB,
   created_at TIMESTAMP DEFAULT NOW()
 );
