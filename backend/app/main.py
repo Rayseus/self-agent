@@ -9,11 +9,13 @@ from app.db import SessionLocal
 from app.models import QALog
 from app.schemas import ChatRequest, ChatResponse
 from app.services.rag_service import RAGService
+from app.services.session_manager import SessionManager
 
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title=settings.app_name)
 rag_service = RAGService()
+session_manager = SessionManager()
 
 app.add_middleware(
     CORSMiddleware,
@@ -60,11 +62,14 @@ def health() -> dict[str, str]:
 @app.post("/api/chat", response_model=ChatResponse)
 def chat(req: ChatRequest, bg: BackgroundTasks) -> ChatResponse:
     trace_id = str(uuid4())
-    result = rag_service.answer(req.question)
+    history = session_manager.get_history(req.session_id)
+    result = rag_service.answer(req.question, history=history)
     logger.info(
-        "trace=%s latency=%.1fms citations=%d",
-        trace_id, result.latency_ms, len(result.citations),
+        "trace=%s session=%s latency=%.1fms citations=%d history_turns=%d",
+        trace_id, req.session_id, result.latency_ms, len(result.citations), len(history),
     )
+    bg.add_task(session_manager.save_turn, req.session_id, "user", req.question)
+    bg.add_task(session_manager.save_turn, req.session_id, "assistant", result.answer)
     bg.add_task(
         _save_qa_log,
         question=req.question,

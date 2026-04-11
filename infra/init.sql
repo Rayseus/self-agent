@@ -26,6 +26,15 @@ CREATE TABLE IF NOT EXISTS embeddings (
 -- CREATE INDEX IF NOT EXISTS idx_embeddings_vector ON embeddings USING hnsw (embedding vector_cosine_ops);
 CREATE INDEX IF NOT EXISTS idx_chunks_trgm ON chunks USING gin (chunk_text gin_trgm_ops);
 
+CREATE TABLE IF NOT EXISTS conversation_turns (
+  id         SERIAL PRIMARY KEY,
+  session_id VARCHAR(64) NOT NULL,
+  role       VARCHAR(10) NOT NULL,
+  content    TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+CREATE INDEX idx_turns_session ON conversation_turns (session_id, created_at);
+
 CREATE TABLE IF NOT EXISTS qa_logs (
   id SERIAL PRIMARY KEY,
   question TEXT NOT NULL,

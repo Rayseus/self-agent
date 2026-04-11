@@ -17,19 +17,31 @@ SYSTEM_PROMPT = """\
 1. 仅使用参考资料中明确提及的信息，不允许推测或补充资料之外的内容。
 2. 回答时标注引用来源编号，如 [1]、[2]。
 3. 若参考资料不足以回答该问题，直接回复"当前资料未涉及该内容，无法回答。"
-4. 回答应简洁、量化，优先给出结论、职责、技术方案与结果指标。"""
+4. 回答应简洁、量化，优先给出结论、职责、技术方案与结果指标。
+5. 若用户问题包含指代词（"它""这个""上面提到的"），结合对话历史理解用户真实意图。"""
 
 
 class LLMClient:
-    def generate_answer(self, question: str, numbered_context: str) -> str:
+    def generate_answer(
+        self,
+        question: str,
+        numbered_context: str,
+        history: list[dict] | None = None,
+    ) -> str:
         if not numbered_context.strip():
             return REFUSE_ANSWER
 
         prompt = f"【参考资料】\n{numbered_context}\n\n用户问题：{question}"
         url = f"{GEMINI_BASE}/{settings.llm_model}:generateContent?key={settings.gemini_api_key}"
         proxy = settings.proxy_url or None
+
+        contents: list[dict] = []
+        for turn in history or []:
+            contents.append({"role": turn["role"], "parts": [{"text": turn["content"]}]})
+        contents.append({"role": "user", "parts": [{"text": prompt}]})
+
         payload = {
-            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+            "contents": contents,
             "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
             "generationConfig": {"temperature": 0.3, "maxOutputTokens": 1024},
         }

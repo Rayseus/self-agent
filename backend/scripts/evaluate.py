@@ -1,5 +1,8 @@
 """评测脚本：加载 eval_questions.json，调用 RAG 链路评估命中率 / 事实准确率 / 拒答准确率。
 
+支持单轮和多轮（type: "multi_turn"）用例。多轮用例按 turns 顺序调用，共享对话历史，
+仅对最后一轮回答做断言。
+
 用法：
     cd backend
     python -m scripts.evaluate
@@ -38,34 +41,70 @@ def check_keywords(answer: str, keywords: list[str]) -> tuple[int, int]:
     return hits, len(keywords)
 
 
+def _eval_single(q: dict, rag: RAGService) -> dict:
+    """评测单轮用例。"""
+    result = rag.answer(q["question"])
+    answer = result.answer
+    expected = q["expected_type"]
+    actually_refused = is_refuse(answer)
+    correct = actually_refused if expected == "refuse" else not actually_refused
+    kw_hit, kw_total = check_keywords(answer, q.get("expected_keywords", []))
+    return {
+        "id": q["id"],
+        "question": q["question"],
+        "category": q["category"],
+        "expected_type": expected,
+        "actually_refused": actually_refused,
+        "correct": correct,
+        "kw_hit": kw_hit,
+        "kw_total": kw_total,
+        "answer_snippet": answer[:150],
+        "latency_ms": result.latency_ms,
+        "retrieval_scores": result.retrieval_scores,
+    }
+
+
+def _eval_multi_turn(q: dict, rag: RAGService) -> dict:
+    """评测多轮用例：按 turns 顺序调用，累积 history，仅断言最后一轮。"""
+    turns: list[dict] = q["turns"]
+    history: list[dict] = []
+    answer = ""
+    last_result = None
+
+    for turn in turns:
+        last_result = rag.answer(turn["content"], history=history)
+        answer = last_result.answer
+        history.append({"role": "user", "content": turn["content"]})
+        history.append({"role": "assistant", "content": answer})
+
+    expected = q["expected_type"]
+    actually_refused = is_refuse(answer)
+    correct = actually_refused if expected == "refuse" else not actually_refused
+    kw_hit, kw_total = check_keywords(answer, q.get("expected_keywords", []))
+    last_question = turns[-1]["content"]
+
+    return {
+        "id": q["id"],
+        "question": " → ".join(t["content"] for t in turns),
+        "category": q["category"],
+        "expected_type": expected,
+        "actually_refused": actually_refused,
+        "correct": correct,
+        "kw_hit": kw_hit,
+        "kw_total": kw_total,
+        "answer_snippet": answer[:150],
+        "latency_ms": last_result.latency_ms if last_result else 0,
+        "retrieval_scores": last_result.retrieval_scores if last_result else [],
+    }
+
+
 def run_eval(questions: list[dict], rag: RAGService) -> list[dict]:
     results: list[dict] = []
     for q in questions:
-        result = rag.answer(q["question"])
-        answer = result.answer
-        expected = q["expected_type"]
-        actually_refused = is_refuse(answer)
-
-        if expected == "refuse":
-            correct = actually_refused
+        if q.get("type") == "multi_turn":
+            results.append(_eval_multi_turn(q, rag))
         else:
-            correct = not actually_refused
-
-        kw_hit, kw_total = check_keywords(answer, q.get("expected_keywords", []))
-
-        results.append({
-            "id": q["id"],
-            "question": q["question"],
-            "category": q["category"],
-            "expected_type": expected,
-            "actually_refused": actually_refused,
-            "correct": correct,
-            "kw_hit": kw_hit,
-            "kw_total": kw_total,
-            "answer_snippet": answer[:150],
-            "latency_ms": result.latency_ms,
-            "retrieval_scores": result.retrieval_scores,
-        })
+            results.append(_eval_single(q, rag))
     return results
 
 

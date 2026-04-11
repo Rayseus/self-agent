@@ -22,7 +22,7 @@ class RAGService:
         self.vector_store = VectorStore()
         self.llm_client = LLMClient()
 
-    def answer(self, question: str) -> AnswerResult:
+    def answer(self, question: str, history: list[dict] | None = None) -> AnswerResult:
         t0 = time.perf_counter()
 
         retrieved = self.vector_store.hybrid_search(question, top_k=5)
@@ -43,7 +43,7 @@ class RAGService:
         ]
         numbered_context = "\n\n".join(numbered_lines)
 
-        answer = self.llm_client.generate_answer(question, numbered_context)
+        answer = self.llm_client.generate_answer(question, numbered_context, history)
 
         if answer == REFUSE_ANSWER:
             latency = round((time.perf_counter() - t0) * 1000, 1)

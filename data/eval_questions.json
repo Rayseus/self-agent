@@ -278,5 +278,93 @@
     "category": "boundary",
     "expected_type": "refuse",
     "expected_keywords": []
+  },
+  {
+    "id": 41,
+    "type": "multi_turn",
+    "category": "multi_turn",
+    "turns": [
+      {"role": "user", "content": "你做过哪些项目？"},
+      {"role": "user", "content": "第一个项目用了什么技术栈？"}
+    ],
+    "expected_type": "answer",
+    "expected_keywords": ["FastAPI", "React"]
+  },
+  {
+    "id": 42,
+    "type": "multi_turn",
+    "category": "multi_turn",
+    "turns": [
+      {"role": "user", "content": "你擅长什么技术？"},
+      {"role": "user", "content": "其中哪个最熟练？"}
+    ],
+    "expected_type": "answer",
+    "expected_keywords": ["RAG"]
+  },
+  {
+    "id": 43,
+    "type": "multi_turn",
+    "category": "multi_turn",
+    "turns": [
+      {"role": "user", "content": "你的 RAG 项目是什么？"},
+      {"role": "user", "content": "它用了什么数据库？"}
+    ],
+    "expected_type": "answer",
+    "expected_keywords": ["PostgreSQL", "pgvector"]
+  },
+  {
+    "id": 44,
+    "type": "multi_turn",
+    "category": "multi_turn",
+    "turns": [
+      {"role": "user", "content": "你做过检索增强生成的项目吗？"},
+      {"role": "user", "content": "这个项目的检索策略是什么？"}
+    ],
+    "expected_type": "answer",
+    "expected_keywords": ["检索"]
+  },
+  {
+    "id": 45,
+    "type": "multi_turn",
+    "category": "multi_turn",
+    "turns": [
+      {"role": "user", "content": "介绍一下你的项目经历"},
+      {"role": "user", "content": "上面提到的项目有做评测吗？"}
+    ],
+    "expected_type": "answer",
+    "expected_keywords": ["评测", "准确率"]
+  },
+  {
+    "id": 46,
+    "type": "multi_turn",
+    "category": "multi_turn",
+    "turns": [
+      {"role": "user", "content": "你擅长什么？"},
+      {"role": "user", "content": "你会弹钢琴吗？"}
+    ],
+    "expected_type": "refuse",
+    "expected_keywords": []
+  },
+  {
+    "id": 47,
+    "type": "multi_turn",
+    "category": "multi_turn",
+    "turns": [
+      {"role": "user", "content": "你用什么后端框架？"},
+      {"role": "user", "content": "它的优势是什么？"}
+    ],
+    "expected_type": "answer",
+    "expected_keywords": ["FastAPI"]
+  },
+  {
+    "id": 48,
+    "type": "multi_turn",
+    "category": "multi_turn",
+    "turns": [
+      {"role": "user", "content": "你的核心技术方向是什么？"},
+      {"role": "user", "content": "能举个具体例子吗？"}
+    ],
+    "expected_type": "answer",
+    "expected_keywords": ["RAG"]
   }
 ]
