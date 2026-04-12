@@ -2,7 +2,7 @@ import time
 from dataclasses import dataclass, field
 
 from app.schemas import Citation
-from app.services.llm_client import REFUSE_ANSWER, LLMClient
+from app.services.llm_client import REFUSE_ANSWER, LLMClient, is_refuse
 from app.services.vector_store import VectorStore
 
 MIN_RRF_SCORE = 0.005
@@ -45,9 +45,9 @@ class RAGService:
 
         answer = self.llm_client.generate_answer(question, numbered_context, history)
 
-        if answer == REFUSE_ANSWER:
+        if is_refuse(answer):
             latency = round((time.perf_counter() - t0) * 1000, 1)
-            return AnswerResult(REFUSE_ANSWER, [], latency, hit_chunks, retrieval_scores)
+            return AnswerResult(answer, [], latency, hit_chunks, retrieval_scores)
 
         citations = [
             Citation(source_name=item.source_name, snippet=item.content[:200])

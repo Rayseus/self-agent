@@ -29,8 +29,11 @@ def load_questions() -> list[dict]:
 
 
 def is_refuse(answer: str) -> bool:
-    refuse_signals = ["无法回答", "未涉及", "未在当前资料中找到", "资料不足"]
-    return any(s in answer for s in refuse_signals)
+    refuse_signals = [
+        "无法回答", "未涉及", "未在当前资料中找到", "资料不足",
+        "cannot answer", "not covered", "no relevant information", "insufficient",
+    ]
+    return any(s in answer.lower() for s in refuse_signals)
 
 
 def check_keywords(answer: str, keywords: list[str]) -> tuple[int, int]:

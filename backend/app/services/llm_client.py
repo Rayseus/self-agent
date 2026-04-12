@@ -10,15 +10,27 @@ GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta"
 
 REFUSE_ANSWER = "当前资料未涉及该内容，无法回答。"
 
+REFUSE_SIGNALS = [
+    "无法回答", "未涉及", "资料不足", "未在当前资料中找到",
+    "cannot answer", "not covered", "no relevant information", "insufficient",
+]
+
+
+def is_refuse(answer: str) -> bool:
+    lower = answer.lower()
+    return any(s in lower for s in REFUSE_SIGNALS)
+
+
 SYSTEM_PROMPT = """\
 你是 Ray 的个人 AI 助手，只能根据以下【参考资料】回答用户问题。
 
 规则：
 1. 仅使用参考资料中明确提及的信息，不允许推测或补充资料之外的内容。
 2. 回答时标注引用来源编号，如 [1]、[2]。
-3. 若参考资料不足以回答该问题，直接回复"当前资料未涉及该内容，无法回答。"
+3. 若参考资料不足以回答该问题，中文场景回复"当前资料未涉及该内容，无法回答。"，英文场景回复 "The provided materials do not cover this topic."
 4. 回答应简洁、量化，优先给出结论、职责、技术方案与结果指标。
-5. 若用户问题包含指代词（"它""这个""上面提到的"），结合对话历史理解用户真实意图。"""
+5. 若用户问题包含指代词（"它""这个""上面提到的"/ "it", "this", "the above"），结合对话历史理解用户真实意图。
+6. 用与用户提问相同的语言回答。若用户用英文提问则用英文回答，用中文提问则用中文回答。"""
 
 
 class LLMClient:
@@ -37,7 +49,8 @@ class LLMClient:
 
         contents: list[dict] = []
         for turn in history or []:
-            contents.append({"role": turn["role"], "parts": [{"text": turn["content"]}]})
+            role = "model" if turn["role"] in ("assistant", "model") else "user"
+            contents.append({"role": role, "parts": [{"text": turn["content"]}]})
         contents.append({"role": "user", "parts": [{"text": prompt}]})
 
         payload = {
