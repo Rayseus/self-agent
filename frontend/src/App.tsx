@@ -1,10 +1,9 @@
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
-import { chat, Citation } from "./api";
+import { chat } from "./api";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
-  citations?: Citation[];
   loading?: boolean;
 }
 
@@ -52,7 +51,7 @@ function App() {
       const result = await chat(q, sessionId);
       setMessages((prev) => [
         ...prev.slice(0, -1),
-        { role: "assistant", content: result.answer, citations: result.citations },
+        { role: "assistant", content: result.answer },
       ]);
     } catch (err) {
       setMessages((prev) => prev.slice(0, -1));
@@ -104,21 +103,7 @@ function App() {
                 {msg.loading ? (
                   <span className="typing-dots"><span /><span /><span /></span>
                 ) : (
-                  <>
-                    <p className="bubble-text">{msg.content}</p>
-                    {msg.citations && msg.citations.length > 0 && (
-                      <details className="citations-details">
-                        <summary>引用来源 ({msg.citations.length})</summary>
-                        <ul>
-                          {msg.citations.map((c, i) => (
-                            <li key={i}>
-                              <strong>{c.source_name}</strong>：{c.snippet}
-                            </li>
-                          ))}
-                        </ul>
-                      </details>
-                    )}
-                  </>
+                  <p className="bubble-text">{msg.content}</p>
                 )}
               </div>
             </div>

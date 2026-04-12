@@ -16,3 +16,5 @@ backend/.env
 # Prompt
 pd.md
 temp.md
+Self-Agent-Resume-Content.md
+docs/render-deploy-guide.md
