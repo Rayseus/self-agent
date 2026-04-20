@@ -1,9 +1,20 @@
+import logging
 import time
 from dataclasses import dataclass, field
 
 from app.schemas import Citation
-from app.services.llm_client import REFUSE_ANSWER, LLMClient, is_refuse
+from app.services.llm_client import (
+    REFUSE_ANSWER_EN,
+    REFUSE_ANSWER_ZH,
+    LLMClient,
+    LLMError,
+    detect_language,
+    error_answer,
+    is_refuse,
+)
 from app.services.vector_store import VectorStore
+
+logger = logging.getLogger(__name__)
 
 MIN_RRF_SCORE = 0.005
 
@@ -15,6 +26,10 @@ class AnswerResult:
     latency_ms: float
     hit_chunks: list[dict] = field(default_factory=list)
     retrieval_scores: list[float] = field(default_factory=list)
+
+
+def _refuse_for(question: str) -> str:
+    return REFUSE_ANSWER_ZH if detect_language(question) == "zh" else REFUSE_ANSWER_EN
 
 
 class RAGService:
@@ -35,7 +50,7 @@ class RAGService:
 
         if not relevant:
             latency = round((time.perf_counter() - t0) * 1000, 1)
-            return AnswerResult(REFUSE_ANSWER, [], latency)
+            return AnswerResult(_refuse_for(question), [], latency)
 
         numbered_lines = [
             f"[{i}]\n{item.content}"
@@ -43,7 +58,18 @@ class RAGService:
         ]
         numbered_context = "\n\n---\n\n".join(numbered_lines)
 
-        answer = self.llm_client.generate_answer(question, numbered_context, history)
+        try:
+            answer = self.llm_client.generate_answer(question, numbered_context, history)
+        except LLMError as e:
+            logger.warning("LLM error kind=%s original=%s", e.kind, e.original)
+            latency = round((time.perf_counter() - t0) * 1000, 1)
+            return AnswerResult(
+                error_answer(e.kind, question),
+                [],
+                latency,
+                hit_chunks,
+                retrieval_scores,
+            )
 
         if is_refuse(answer):
             latency = round((time.perf_counter() - t0) * 1000, 1)

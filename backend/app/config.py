@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     llm_model: str = "models/gemini-2.5-flash"
     embedding_dim: int = 3072
     proxy_url: str = ""
-    cors_origins: str = "*"
+    cors_origins: str = "http://localhost:5173"
 
 
 settings = Settings()

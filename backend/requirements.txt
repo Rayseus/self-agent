@@ -1,8 +1,7 @@
-fastapi
-uvicorn[standard]
-pydantic-settings
-sqlalchemy
-psycopg2-binary
-pgvector
-httpx
-google-generativeai
+fastapi==0.135.3
+uvicorn[standard]==0.43.0
+pydantic-settings==2.13.1
+sqlalchemy==2.0.49
+psycopg2-binary==2.9.11
+pgvector==0.4.2
+httpx==0.28.1

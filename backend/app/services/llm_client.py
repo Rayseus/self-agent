@@ -1,4 +1,5 @@
 import logging
+import re
 from datetime import date
 
 import httpx
@@ -9,17 +10,60 @@ logger = logging.getLogger(__name__)
 
 GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta"
 
-REFUSE_ANSWER = "当前资料未涉及该内容，无法回答。"
+# ---------- 差异化响应文案 ----------
+# 区分三类场景，避免统一用"资料未涉及"误导用户：
+#   1. REFUSE       —— 真正的资料不足拒答（业务正常）
+#   2. SERVICE_ERROR —— 系统故障（超时/网络/5xx/未知）
+#   3. RATE_LIMIT    —— 限流（HTTP 429）
+
+REFUSE_ANSWER_ZH = "当前资料未涉及该内容，无法回答。"
+REFUSE_ANSWER_EN = "The provided materials do not cover this topic."
+REFUSE_ANSWER = REFUSE_ANSWER_ZH  # 向后兼容：默认中文拒答
+
+SERVICE_ERROR_ZH = "服务暂时不可用，请稍后重试。"
+SERVICE_ERROR_EN = "Service temporarily unavailable, please try again later."
+
+RATE_LIMIT_ZH = "当前请求较多，请稍后重试。"
+RATE_LIMIT_EN = "The service is busy, please try again later."
 
 REFUSE_SIGNALS = [
     "无法回答", "未涉及", "资料不足", "未在当前资料中找到",
-    "cannot answer", "not covered", "no relevant information", "insufficient",
+    "cannot answer", "do not cover", "not covered", "no relevant information", "insufficient",
 ]
+
+_CJK_RE = re.compile(r"[\u4e00-\u9fff]")
 
 
 def is_refuse(answer: str) -> bool:
     lower = answer.lower()
     return any(s in lower for s in REFUSE_SIGNALS)
+
+
+def detect_language(text: str) -> str:
+    """极简语言检测：含 CJK 字符视为中文，否则英文。用于故障文案选择。"""
+    return "zh" if _CJK_RE.search(text) else "en"
+
+
+def error_answer(kind: str, question: str) -> str:
+    """根据故障类型 + 问题语言返回对应文案。"""
+    lang = detect_language(question)
+    if kind == "rate_limit":
+        return RATE_LIMIT_ZH if lang == "zh" else RATE_LIMIT_EN
+    return SERVICE_ERROR_ZH if lang == "zh" else SERVICE_ERROR_EN
+
+
+class LLMError(RuntimeError):
+    """LLM 调用故障。kind 区分类型供上层返回差异化文案。
+
+    kind:
+        "rate_limit"     — HTTP 429 限流
+        "service_error"  — 其他 HTTP 错误 / 超时 / 网络断开 / 空响应 / 未知异常
+    """
+
+    def __init__(self, kind: str, original: Exception | str | None = None) -> None:
+        self.kind = kind
+        self.original = original
+        super().__init__(f"{kind}: {original}")
 
 
 SYSTEM_PROMPT_TEMPLATE = """\
@@ -48,8 +92,12 @@ class LLMClient:
         numbered_context: str,
         history: list[dict] | None = None,
     ) -> str:
+        """正常：返回模型文本。
+        资料空：返回拒答（语言随 question）。
+        故障：抛 LLMError，由 rag_service 降级。
+        """
         if not numbered_context.strip():
-            return REFUSE_ANSWER
+            return REFUSE_ANSWER_ZH if detect_language(question) == "zh" else REFUSE_ANSWER_EN
 
         prompt = f"【参考资料】\n{numbered_context}\n\n用户问题：{question}"
         url = f"{GEMINI_BASE}/{settings.llm_model}:generateContent?key={settings.gemini_api_key}"
@@ -73,12 +121,26 @@ class LLMClient:
                 resp.raise_for_status()
                 data = resp.json()
         except httpx.HTTPStatusError as e:
-            logger.error("Gemini API error: %s — %s", e.response.status_code, e.response.text[:500])
-            return REFUSE_ANSWER
+            status = e.response.status_code
+            logger.error("Gemini API http error: %s — %s", status, e.response.text[:500])
+            if status == 429:
+                raise LLMError("rate_limit", e) from e
+            raise LLMError("service_error", e) from e
+        except (httpx.TimeoutException, httpx.TransportError) as e:
+            logger.error("Gemini API transport failure: %s", e)
+            raise LLMError("service_error", e) from e
+        except Exception as e:
+            logger.exception("Gemini API unexpected error")
+            raise LLMError("service_error", e) from e
 
         candidates = data.get("candidates", [])
         if not candidates:
-            return REFUSE_ANSWER
+            logger.warning("Gemini returned empty candidates: %s", str(data)[:500])
+            raise LLMError("service_error", "empty candidates")
 
         parts = candidates[0].get("content", {}).get("parts", [])
-        return parts[0]["text"] if parts else REFUSE_ANSWER
+        if not parts:
+            logger.warning("Gemini returned empty parts")
+            raise LLMError("service_error", "empty parts")
+
+        return parts[0]["text"]

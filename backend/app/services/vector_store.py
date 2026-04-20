@@ -1,10 +1,13 @@
+import logging
 import re
 from dataclasses import dataclass
 
 from sqlalchemy import text
 
 from app.db import SessionLocal
-from app.services.embedding_client import embed_query
+from app.services.embedding_client import EmbeddingError, embed_query
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -29,7 +32,11 @@ class VectorStore:
         return merged
 
     def _vector_search(self, query: str, top_k: int = 10) -> list[RetrievedChunk]:
-        query_vec = embed_query(query)
+        try:
+            query_vec = embed_query(query)
+        except EmbeddingError:
+            logger.warning("vector search degraded: embedding unavailable, fallback to keyword only")
+            return []
         session = SessionLocal()
         try:
             rows = session.execute(
