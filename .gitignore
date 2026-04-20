@@ -13,8 +13,13 @@ backend/.env
 # OS
 .DS_Store
 
-# Prompt
+# 个人笔记 / 规划文档（不入库）
 pd.md
 temp.md
-Self-Agent-Resume-Content.md
+tpt.md
+Self-Agent-Resume-Context.md
 docs/render-deploy-guide.md
+
+# 知识库原始素材（含完整联系方式）与私密数据
+data/raw/
+data/private/

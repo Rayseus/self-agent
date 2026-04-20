@@ -62,4 +62,4 @@
 
 ## 怎么联系你？
 
-Email：lesoleillry@icloud.com，电话：18665951900，Github：https://github.com/Rayseus。
+Email：lesoleillry@icloud.com，Github：https://github.com/Rayseus。
