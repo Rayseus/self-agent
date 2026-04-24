@@ -233,9 +233,9 @@
   {
     "id": 34,
     "question": "你有几年工作经验？",
-    "category": "boundary",
-    "expected_type": "refuse",
-    "expected_keywords": []
+    "category": "capability",
+    "expected_type": "answer",
+    "expected_keywords": ["7 年", "工程"]
   },
   {
     "id": 35,
@@ -268,9 +268,9 @@
   {
     "id": 39,
     "question": "你有没有做过和学历相关的项目？",
-    "category": "boundary",
-    "expected_type": "refuse",
-    "expected_keywords": []
+    "category": "project",
+    "expected_type": "answer",
+    "expected_keywords": ["佐治亚理工", "课程"]
   },
   {
     "id": 40,

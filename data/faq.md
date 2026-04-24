@@ -4,6 +4,10 @@
 
 我叫李睿阳（Li Ruiyang），是一名资深全栈工程师。佐治亚理工学院机器学习硕士（2025 年毕业），戴尔豪斯大学计算机科学学士。拥有 7 年以上工程经验，先后在华为云、路特斯汽车、Shopee、爱立信、大疆车载等公司任职，擅长将全栈工程能力与 AI 技术融合落地。2024 年 11 月从大疆车载离职后赴美完成硕士学位，目前正在求职中。
 
+## 你的角色是什么？
+
+定位是资深全栈工程师 + RAG / LLM 应用工程师。一方面具备 7 年以上前后端 + 云原生 + 边缘计算的工程化能力，能独立完成从文档建库、检索、Prompt 设计、前端交互到线上部署的全链路交付；另一方面专注 LLM 应用落地，擅长用 RAG、Prompt Engineering、KVMemNet 等技术解决企业知识问答、智能陪练、个性化推荐等场景的实际问题。
+
 ## 你擅长什么技术？
 
 擅长 AI Agent 与 LLM 应用（RAG、Prompt Engineering、KVMemNet）、前端与 3D 可视化（React、Three.js、TypeScript）、后端与云原生（FastAPI、Node.js、Docker、K8s）、边缘计算与 IoT（Rust、MQTT、WebAssembly）。
