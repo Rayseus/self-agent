@@ -18,7 +18,9 @@ function App() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showColdStartTip, setShowColdStartTip] = useState(true);
+  const [healthReady, setHealthReady] = useState(false);
+  const [showColdStartTip, setShowColdStartTip] = useState(false);
+  const [coldStartShown, setColdStartShown] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -26,13 +28,16 @@ function App() {
   }, [messages]);
 
   useEffect(() => {
-    pingHealth();
-    const timer = window.setTimeout(
-      () => setShowColdStartTip(false),
-      COLD_START_TIMEOUT_MS,
-    );
-    return () => window.clearTimeout(timer);
+    pingHealth()
+      .then(() => setHealthReady(true))
+      .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (healthReady && showColdStartTip) {
+      setShowColdStartTip(false);
+    }
+  }, [healthReady, showColdStartTip]);
 
   function handleNewChat() {
     setSessionId(crypto.randomUUID());
@@ -54,6 +59,15 @@ function App() {
       { role: "assistant", content: "", loading: true },
     ]);
     setLoading(true);
+
+    if (!healthReady && !coldStartShown) {
+      setShowColdStartTip(true);
+      setColdStartShown(true);
+      window.setTimeout(
+        () => setShowColdStartTip(false),
+        COLD_START_TIMEOUT_MS,
+      );
+    }
 
     try {
       const result = await chat(q, sessionId);
