@@ -24,6 +24,10 @@ const zh: Dict = {
     request: (status: number) => `请求失败：${status}`,
     unknown: "未知错误",
   },
+  coldStart: {
+    tip: "服务器冷启动中，首次提问可能需 30-60 秒唤醒，请稍候。",
+    dismiss: "关闭提示",
+  },
 };
 
 export default zh;

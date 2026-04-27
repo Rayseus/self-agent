@@ -24,6 +24,10 @@ const en: Dict = {
     request: (status: number) => `Request failed: ${status}`,
     unknown: "Unknown error",
   },
+  coldStart: {
+    tip: "Free-tier server may take 30-60s to wake up on first ask. Thanks for your patience.",
+    dismiss: "Dismiss",
+  },
 };
 
 export default en;

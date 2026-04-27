@@ -20,6 +20,10 @@ export class ApiError extends Error {
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
+export function pingHealth(): void {
+  fetch(`${API_BASE}/health`).catch(() => {});
+}
+
 export async function chat(
   question: string,
   sessionId: string,

@@ -1,7 +1,9 @@
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
-import { ApiError, chat } from "./api";
+import { ApiError, chat, pingHealth } from "./api";
 import { useLang } from "./i18n";
 import type { Lang } from "./i18n";
+
+const COLD_START_TIMEOUT_MS = 30000;
 
 interface Message {
   role: "user" | "assistant";
@@ -16,11 +18,21 @@ function App() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showColdStartTip, setShowColdStartTip] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    pingHealth();
+    const timer = window.setTimeout(
+      () => setShowColdStartTip(false),
+      COLD_START_TIMEOUT_MS,
+    );
+    return () => window.clearTimeout(timer);
+  }, []);
 
   function handleNewChat() {
     setSessionId(crypto.randomUUID());
@@ -49,6 +61,7 @@ function App() {
         ...prev.slice(0, -1),
         { role: "assistant", content: result.answer },
       ]);
+      setShowColdStartTip(false);
     } catch (err) {
       setMessages((prev) => prev.slice(0, -1));
       if (err instanceof ApiError) {
@@ -105,6 +118,21 @@ function App() {
           </div>
         </div>
       </header>
+
+      {showColdStartTip && (
+        <div className="cold-start-banner" role="status">
+          <span className="cold-start-icon" aria-hidden="true">ⓘ</span>
+          <span className="cold-start-text">{t.coldStart.tip}</span>
+          <button
+            type="button"
+            className="cold-start-close"
+            aria-label={t.coldStart.dismiss}
+            onClick={() => setShowColdStartTip(false)}
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <main className="message-list">
         {messages.length === 0 ? (

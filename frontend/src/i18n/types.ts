@@ -19,4 +19,8 @@ export interface Dict {
     request: (status: number) => string;
     unknown: string;
   };
+  coldStart: {
+    tip: string;
+    dismiss: string;
+  };
 }

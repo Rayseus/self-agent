@@ -340,6 +340,64 @@ body {
   text-align: center;
 }
 
+/* ---- cold start banner ---- */
+
+.cold-start-banner {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 10px 0;
+  padding: 8px 10px;
+  background: #fff8e1;
+  border: 1px solid #f0d68a;
+  border-radius: 8px;
+  color: #6b5316;
+  font-size: 12px;
+  line-height: 1.4;
+  animation: cold-start-fade-in 0.2s ease-out;
+}
+
+.cold-start-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.cold-start-text {
+  flex: 1;
+}
+
+.cold-start-close {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  background: transparent;
+  color: #8a7a45;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.cold-start-close:hover {
+  background: rgba(138, 122, 69, 0.12);
+}
+
+@keyframes cold-start-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 481px) {
+  .cold-start-banner {
+    margin: 10px 16px 0;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
 /* ---- responsive ---- */
 
 @media (min-width: 481px) {
