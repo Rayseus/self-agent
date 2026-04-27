@@ -1,5 +1,6 @@
-"""llm_client 纯函数单测：is_refuse / detect_language / error_answer。"""
+"""llm_client 纯函数单测：is_refuse / detect_language / error_answer / system prompt 契约。"""
 
+from app.services import llm_client
 from app.services.llm_client import (
     RATE_LIMIT_EN,
     RATE_LIMIT_ZH,
@@ -84,3 +85,24 @@ class TestErrorAnswer:
         """未知 kind 兜底回 service_error 文案。"""
         assert error_answer("weird_kind", "你好吗？") == SERVICE_ERROR_ZH
         assert error_answer("", "Hi") == SERVICE_ERROR_EN
+
+
+class TestSystemPromptContract:
+    """System Prompt 契约测试：防止后续迭代误删跨语言翻译指令。"""
+
+    def test_contains_today(self):
+        prompt = llm_client._build_system_prompt()
+        assert "当前日期" in prompt
+
+    def test_contains_translation_directive(self):
+        """方案 A 强制翻译指令必须存在，否则英文提问会出现中文 bullet 标签。"""
+        prompt = llm_client._build_system_prompt()
+        assert "语言一致性" in prompt
+        assert "翻译" in prompt
+        assert "CJK" in prompt
+
+    def test_contains_proper_noun_whitelist(self):
+        """专有名词白名单避免把 FastAPI/Georgia Tech 误译。"""
+        prompt = llm_client._build_system_prompt()
+        assert "FastAPI" in prompt
+        assert "Georgia Tech" in prompt

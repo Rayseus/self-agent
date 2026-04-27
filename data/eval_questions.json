@@ -366,5 +366,45 @@
     ],
     "expected_type": "answer",
     "expected_keywords": ["RAG"]
+  },
+  {
+    "id": 49,
+    "question": "What is your tech stack?",
+    "category": "capability_en",
+    "expected_type": "answer",
+    "expected_keywords": ["FastAPI", "React", "PostgreSQL"],
+    "expected_lang": "en"
+  },
+  {
+    "id": 50,
+    "question": "What backend frameworks do you use?",
+    "category": "capability_en",
+    "expected_type": "answer",
+    "expected_keywords": ["FastAPI"],
+    "expected_lang": "en"
+  },
+  {
+    "id": 51,
+    "question": "Tell me about your RAG project experience.",
+    "category": "project_en",
+    "expected_type": "answer",
+    "expected_keywords": ["RAG"],
+    "expected_lang": "en"
+  },
+  {
+    "id": 52,
+    "question": "How many years of frontend experience do you have?",
+    "category": "capability_en",
+    "expected_type": "answer",
+    "expected_keywords": ["7"],
+    "expected_lang": "en"
+  },
+  {
+    "id": 53,
+    "question": "Do you have experience with prompt engineering?",
+    "category": "capability_en",
+    "expected_type": "answer",
+    "expected_keywords": ["Prompt"],
+    "expected_lang": "en"
   }
 ]
