@@ -9,6 +9,15 @@ export interface ChatResponse {
   trace_id: string;
 }
 
+export class ApiError extends Error {
+  status: number;
+  constructor(status: number) {
+    super(`api_error_${status}`);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
 export async function chat(
@@ -21,7 +30,7 @@ export async function chat(
     body: JSON.stringify({ question, session_id: sessionId }),
   });
   if (!res.ok) {
-    throw new Error(`请求失败: ${res.status}`);
+    throw new ApiError(res.status);
   }
   return res.json() as Promise<ChatResponse>;
 }

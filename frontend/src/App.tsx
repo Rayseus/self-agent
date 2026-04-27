@@ -1,5 +1,7 @@
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
-import { chat } from "./api";
+import { ApiError, chat } from "./api";
+import { useLang } from "./i18n";
+import type { Lang } from "./i18n";
 
 interface Message {
   role: "user" | "assistant";
@@ -7,14 +9,8 @@ interface Message {
   loading?: boolean;
 }
 
-const SAMPLE_QUESTIONS = [
-  "你擅长什么技术栈？",
-  "你在 RAG 项目里负责了哪些核心工作？",
-  "介绍一下你的项目经历",
-  "你的工作经验有多久？",
-];
-
 function App() {
+  const { lang, t, setLang } = useLang();
   const [sessionId, setSessionId] = useState(() => crypto.randomUUID());
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -55,7 +51,11 @@ function App() {
       ]);
     } catch (err) {
       setMessages((prev) => prev.slice(0, -1));
-      setError(err instanceof Error ? err.message : "未知错误");
+      if (err instanceof ApiError) {
+        setError(t.error.request(err.status));
+      } else {
+        setError(t.error.unknown);
+      }
     } finally {
       setLoading(false);
     }
@@ -72,24 +72,46 @@ function App() {
     setInput(q);
   }
 
+  const langOptions: { value: Lang; label: string }[] = [
+    { value: "zh", label: "中文" },
+    { value: "en", label: "English" },
+  ];
+
   return (
     <div className="chat-layout">
       <header className="chat-header">
         <div className="chat-header-inner">
-          <div>
-            <h1>Self-Agent</h1>
-            <p className="desc">基于个人简历与项目经验的 RAG 问答助手</p>
+          <div className="chat-header-title">
+            <h1>{t.header.title}</h1>
+            <p className="desc">{t.header.desc}</p>
           </div>
-          <button className="btn-outline" onClick={handleNewChat}>新对话</button>
+          <div className="chat-header-actions">
+            <div className="lang-switch" role="group" aria-label="language">
+              {langOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  className={lang === opt.value ? "active" : ""}
+                  aria-pressed={lang === opt.value}
+                  onClick={() => setLang(opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <button className="btn-outline" onClick={handleNewChat}>
+              {t.header.newChat}
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="message-list">
         {messages.length === 0 ? (
           <div className="empty-state">
-            <p className="empty-title">有什么想了解的？试试这些问题：</p>
+            <p className="empty-title">{t.empty.title}</p>
             <div className="sample-grid">
-              {SAMPLE_QUESTIONS.map((q) => (
+              {t.empty.samples.map((q) => (
                 <button key={q} className="sample-btn" onClick={() => fillQuestion(q)}>
                   {q}
                 </button>
@@ -119,11 +141,11 @@ function App() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={onKeyDown}
-            placeholder="输入你的问题…（Enter 发送，Shift+Enter 换行）"
+            placeholder={t.input.placeholder}
             rows={1}
           />
           <button type="submit" disabled={loading || !input.trim()}>
-            {loading ? "回答中…" : "发送"}
+            {loading ? t.input.sending : t.input.send}
           </button>
         </form>
       </footer>
