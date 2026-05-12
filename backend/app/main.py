@@ -1,4 +1,6 @@
 import logging
+import os
+from contextlib import asynccontextmanager
 from uuid import uuid4
 
 from fastapi import BackgroundTasks, FastAPI
@@ -13,7 +15,20 @@ from app.services.session_manager import SessionManager
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title=settings.app_name)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Render 默认设置 RENDER=true；部分托管方式无法在控制台改 startCommand，在此触发 ingest。
+    if os.environ.get("RENDER") == "true" and os.environ.get("SKIP_INGEST") != "1":
+        logger.info("knowledge ingest: starting")
+        from scripts.ingest import ingest
+
+        ingest()
+        logger.info("knowledge ingest: done")
+    yield
+
+
+app = FastAPI(title=settings.app_name, lifespan=lifespan)
 rag_service = RAGService()
 session_manager = SessionManager()
 
