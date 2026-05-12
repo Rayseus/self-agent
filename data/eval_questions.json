@@ -183,10 +183,10 @@
   },
   {
     "id": 27,
-    "question": "你的年薪是多少？",
-    "category": "boundary",
-    "expected_type": "refuse",
-    "expected_keywords": []
+    "question": "你目前的年薪是多少？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["面谈"]
   },
   {
     "id": 28,
@@ -406,5 +406,161 @@
     "expected_type": "answer",
     "expected_keywords": ["Prompt"],
     "expected_lang": "en"
+  },
+  {
+    "id": 54,
+    "question": "你为什么从大疆车载离职？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["佐治亚理工", "硕士"]
+  },
+  {
+    "id": 55,
+    "question": "你为什么从爱立信离职？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["部门", "解散"]
+  },
+  {
+    "id": 56,
+    "question": "你为什么从 Shopee 离职？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["研发中心", "裁撤"]
+  },
+  {
+    "id": 57,
+    "question": "你为什么从路特斯汽车离职？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["团队", "解散"]
+  },
+  {
+    "id": 58,
+    "question": "你为什么从华为云离职？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["车载", "智能硬件"]
+  },
+  {
+    "id": 59,
+    "question": "你期望的工作地点是哪里？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["remote", "relocation"]
+  },
+  {
+    "id": 60,
+    "question": "Why did you leave Ericsson?",
+    "category": "faq_en",
+    "expected_type": "answer",
+    "expected_keywords": ["dissolved", "China"],
+    "expected_lang": "en"
+  },
+  {
+    "id": 61,
+    "question": "What is your expected salary?",
+    "category": "faq_en",
+    "expected_type": "answer",
+    "expected_keywords": ["package"],
+    "expected_lang": "en"
+  },
+  {
+    "id": 62,
+    "question": "你最快多久可以入职？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["2 周", "offer"]
+  },
+  {
+    "id": 63,
+    "question": "你有竞业协议吗？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["未", "竞业"]
+  },
+  {
+    "id": 64,
+    "question": "你需要工作签证 sponsorship 吗？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["中国大陆", "sponsorship"]
+  },
+  {
+    "id": 65,
+    "question": "你硕士毕业后这段时间在做什么？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["创业", "工业界"]
+  },
+  {
+    "id": 66,
+    "question": "你换过多家公司，怎么看待跳槽频次？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["被动", "结构性"]
+  },
+  {
+    "id": 67,
+    "question": "你期望什么类型的公司？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["大厂", "外企"]
+  },
+  {
+    "id": 68,
+    "question": "你期望的职级是什么？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["Senior", "Staff"]
+  },
+  {
+    "id": 69,
+    "question": "你有带团队经验吗？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["欧洲", "印度"]
+  },
+  {
+    "id": 70,
+    "question": "你的长期职业规划是什么？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["AI", "架构师"]
+  },
+  {
+    "id": 71,
+    "question": "你的英文工作能力如何？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["跨时区", "评审"]
+  },
+  {
+    "id": 72,
+    "question": "你毕业后有继续做硕士论文相关的研究或代码吗？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["论文", "GitHub"]
+  },
+  {
+    "id": 73,
+    "question": "你期望的年薪是多少？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["30 万", "package"]
+  },
+  {
+    "id": 74,
+    "question": "你上一份工作的薪资是多少？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["面谈"]
+  },
+  {
+    "id": 75,
+    "question": "你毕业后做了什么开源项目？",
+    "category": "faq",
+    "expected_type": "answer",
+    "expected_keywords": ["CLI", "KVMemNet"]
   }
 ]
