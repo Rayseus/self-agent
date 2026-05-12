@@ -94,6 +94,8 @@ def ingest(dry_run: bool = False) -> None:
     md_files = sorted(DATA_DIR.glob("*.md"))
     if not md_files:
         print(f"未在 {DATA_DIR} 下找到 .md 文件")
+        if not dry_run:
+            sys.exit(1)
         return
 
     if dry_run:

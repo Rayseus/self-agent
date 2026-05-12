@@ -11,9 +11,8 @@ services:
     runtime: python
     plan: free
     rootDir: backend
-    # 免费版无 Shell：每次部署在构建阶段入库（美国出口 IP，可走 Gemini；需已配置 GEMINI_API_KEY）
-    buildCommand: pip install -r requirements.txt && python -m scripts.ingest
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m scripts.ingest && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
         fromDatabase:
