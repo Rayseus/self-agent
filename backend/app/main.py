@@ -1,4 +1,6 @@
 import logging
+import os
+from contextlib import asynccontextmanager
 from uuid import uuid4
 
 from fastapi import BackgroundTasks, FastAPI
@@ -13,7 +15,24 @@ from app.services.session_manager import SessionManager
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title=settings.app_name)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Ingest 默认由 GitHub Actions 在 data/** 变更时远程触发（见 .github/workflows/ingest.yml），
+    # 服务启动时不再阻塞跑 ingest。仅在显式设置 INGEST_ON_BOOT=1 时作为应急后门触发一次。
+    if os.environ.get("INGEST_ON_BOOT") == "1":
+        logger.info("knowledge ingest: starting (INGEST_ON_BOOT=1)")
+        try:
+            from scripts.ingest import ingest
+
+            ingest()
+            logger.info("knowledge ingest: done")
+        except Exception:
+            logger.exception("knowledge ingest failed; service will still start")
+    yield
+
+
+app = FastAPI(title=settings.app_name, lifespan=lifespan)
 rag_service = RAGService()
 session_manager = SessionManager()
 
