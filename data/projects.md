@@ -1,9 +1,30 @@
 # 项目经历
 
+## LLM 量化压缩课题研究（与美国某头部科技公司合作，受保密协议约束）
+
+- **背景**：2025.4 起以独立研究身份与美国某头部科技公司合作开展课题研究，验证主流后训练量化算法在中等规模开源模型上的工程可行性。受保密协议（NDA）约束，公司名称、具体业务场景与精度 / 显存 / 吞吐等量化指标不公开，欢迎在面试中进一步详谈。
+- **职责**：独立完成量化算法实现、端到端验证链路与精度评估，论文撰写中。
+- **技术栈**：PyTorch、vLLM、GPTQ、AWQ、SmoothQuant、CUDA。
+- **核心亮点**：
+  - 搭建 GPTQ / AWQ / SmoothQuant 在 7B-13B 参数规模开源模型上的 W4A8 量化端到端验证链路，覆盖权重量化、激活量化、KV cache 处理与推理部署。
+  - 基于 vLLM 推理框架进行量化后模型的吞吐与延迟基准测试，对比不同算法在精度、显存占用与推理速度上的权衡。
+  - 输出系统性的算法对比结论与工程实践经验，作为论文研究的基础。
+
+## 智能餐饮推荐平台（为早期创业团队提供 AI 技术支持）
+
+- **背景**：2025 年起为一支早期创业团队的智能餐饮推荐平台项目提供 AI 方向的技术支持，主导团队在 LLM 应用与 RAG 方向的工程实践落地。
+- **职责**：AI 技术方向负责人，规划 LLM 应用架构、RAG 链路与多用户画像建模方案。
+- **技术栈**：LangChain、FastAPI、PostgreSQL、Python。
+- **核心亮点**：
+  - 设计多用户画像建模与"千人千面"食谱推荐机制，结合用户口味、饮食限制与历史行为数据生成个性化推荐。
+  - 主导 LLM 应用与 RAG 方向的工程实践，将向量检索、Prompt 工程与业务规则有效融合。
+
 ## Self-Agent：基于 KVMemNet 的个人知识库分身
 
 - **背景**：融合深度学习研究成果与 RAG 技术，构建具备高事实准确率的个人数字分身 Agent，实现基于私有文档的精准问答。
 - **职责**：全栈独立开发，涵盖架构设计、RAG 链路、前后端交付与评测体系。
+- **仓库**：https://github.com/Rayseus/self-agent
+- **在线体验**：https://self-agent-web.onrender.com/
 - **技术栈**：FastAPI、React、TypeScript、PostgreSQL、pgvector、Gemini API、Docker。
 - **核心亮点**：
   - 借鉴 KVMemNet 的键值寻址逻辑，利用点积注意力机制优化检索链路，提升模型从长文档中捕捉精确事实的能力。
@@ -11,11 +32,24 @@
   - 设计高约束 System Prompt 并结合检索阈值熔断机制，实现 100% 忠于原文的回答，前端强制映射来源引用。
   - 支持多轮对话与双语问答，48 条评测样例覆盖命中率、事实准确率与拒答准确率。
 
+## CLI-based Personal AI Agent：长程记忆型个人 AI Agent
+
+- **背景**：基于 CLI 的个人 Agent，实现跨会话的用户事实记忆与工具调用，是硕士论文研究构想的工程化实践。
+- **职责**：架构设计、长程记忆模块与工具调用链路独立开发，原型已开源至 GitHub。
+- **仓库**：https://github.com/Rayseus/CLI-based_personal_AI_agent
+- **技术栈**：Python、SQLite、Google Gen AI SDK（google-genai）、Gemini API（默认 gemini-2.5-flash）、KVMemNet 思想；JSON 工具 schema 兼容 OpenAI / Gemini / Claude。
+- **核心亮点**：
+  - 针对 LLM 在多轮对话中缺乏稳定长期记忆、工具调用缺少持久化上下文的问题，设计结构化记忆存储与检索机制（`memory_store.py` 使用 token + tag 重叠的确定性打分检索，无需 embedding），让 Agent 在跨会话场景下保留并复用用户事实。
+  - 基于 KVMemNet 键值记忆思想扩展为多工具 CLI Agent，使用 SQLite 持久化外部记忆。引入确定性引用验证机制（`verify_citations`）：每条 `[memory:<id>]` 引用通过 `SELECT 1 FROM memories WHERE id = ?` 强制校验，校验失败的引用直接从回复中删除，模型无法绕过该验证步骤。
+  - 抽象 LLM-agnostic JSON 工具 schema（`save_memory` / `search_memory` 两个动词式工具），工具集可跨 OpenAI / Gemini / Claude 复用，切换提供商时只需改 `agent.py` 的 schema 转换层。
+  - 在 `agent.log` 中记录 `[TOOL]` / `[VERIFY]` 全链路诊断，空结果集（`results: []`）作为"我不知道"的可审计证据。包含 35+ 单元测试覆盖 memory_store、tools、agent 三层。
+
 ## AI-Role-Player：智能销售陪练 Agent 系统
 
 - **背景**：开发基于生成式 AI 的沉浸式销售培训系统，通过拟真语音交互模拟复杂的客户对话场景。
 - **职责**：系统架构设计与核心链路开发。
-- **技术栈**：FastAPI、Web Speech API (STT)、Edge TTS、Python。
+- **仓库**：https://github.com/Rayseus/AI-Role-Player-Demo
+- **技术栈**：FastAPI、Next.js、Web Speech API (STT)、Edge TTS、Google Gemini、Python。
 - **核心亮点**：
   - 集成 Web Speech API 与 Edge TTS，通过 FastAPI 异步线程池处理阻塞型调用，实现毫秒级延迟的语音响应。
   - 通过提示工程动态注入"语音行为指令"（如不耐烦、语速变化），强制 LLM 扮演特定客户画像，并生成结构化 JSON 反馈报告。
@@ -60,11 +94,11 @@
   - 通过绘制学习曲线、混淆矩阵、模型复杂度曲线进行诊断分析；采用网格搜索进行超参数调优（正则化强度、K 值等）；应用特征工程进行数据归一化。
   - 准确诊断出神经网络在用户行为数据上的欠拟合问题及在另一数据集中的过拟合问题；通过调优使 RBF SVM 在数据集上达到 92% 准确度。
 
-## 3D 计算机视觉数据平台（大疆车载）
+## 3D 计算机视觉数据平台（大疆车载 / 卓驭）
 
-- **背景**：在大疆车载（車驭）任职全栈工程师期间，负责自动驾驶感知数据的标注与管理平台。
+- **背景**：在大疆车载（卓驭）任职全栈工程师期间，负责自动驾驶感知数据的标注与管理平台。
 - **职责**：4D 数据标注服务架构与后端 API 开发。
-- **技术栈**：Three.js、React、Node.js、Golang。
+- **技术栈**：Node.js、Golang、Three.js、React、TypeScript、PostgreSQL、Redis、Python。
 - **核心亮点**：
   - 架构基于 Three.js 的 4D 数据标注服务，用于可视化和标记高精度点云数据，每日处理 10,000+ 帧数据，直接提升感知模型训练质量。
   - 开发高吞吐量 Node.js 后端 API 管理数据闭环生命周期，将训练数据准备流程加速 40%。
@@ -73,7 +107,7 @@
 
 - **背景**：在爱立信任职高级全栈工程师期间，负责车联网平台与前端架构优化。
 - **职责**：实时数据大屏开发与微前端框架重构。
-- **技术栈**：React、TypeScript、OpenGL、Node.js。
+- **技术栈**：React、TypeScript、OpenGL、Node.js、PostgreSQL、Redis、Python。
 - **核心亮点**：
   - 实现车联网实时智能大屏，支撑 10,000+ 并发用户的传感器遥测数据秒级可视化。
   - 重构 Qiankun 微前端框架实现严格沙箱隔离，跨应用冲突减少 95%，集成时间缩短 50%。
@@ -100,7 +134,7 @@
 
 - **背景**：在华为云 IoT 任职全栈工程师期间，负责 IoT 平台的数据分析与可视化功能。
 - **职责**：实时与时序分析功能全栈开发、灰度发布方案设计。
-- **技术栈**：Angular、JavaScript、AntV/G6、Python、ECharts、Node.js。
+- **技术栈**：Angular、JavaScript、AntV/G6、Python、ECharts、Node.js、MySQL、Redis。
 - **核心亮点**：
   - 全栈开发实时与时序分析功能，推动高级订阅服务增长 15%。
   - 设计多环境配置与灰度发布方案，将版本回滚率降低 90%。
