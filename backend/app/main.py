@@ -18,13 +18,17 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Render 默认设置 RENDER=true；部分托管方式无法在控制台改 startCommand，在此触发 ingest。
-    if os.environ.get("RENDER") == "true" and os.environ.get("SKIP_INGEST") != "1":
-        logger.info("knowledge ingest: starting")
-        from scripts.ingest import ingest
+    # Ingest 默认由 GitHub Actions 在 data/** 变更时远程触发（见 .github/workflows/ingest.yml），
+    # 服务启动时不再阻塞跑 ingest。仅在显式设置 INGEST_ON_BOOT=1 时作为应急后门触发一次。
+    if os.environ.get("INGEST_ON_BOOT") == "1":
+        logger.info("knowledge ingest: starting (INGEST_ON_BOOT=1)")
+        try:
+            from scripts.ingest import ingest
 
-        ingest()
-        logger.info("knowledge ingest: done")
+            ingest()
+            logger.info("knowledge ingest: done")
+        except Exception:
+            logger.exception("knowledge ingest failed; service will still start")
     yield
 
 

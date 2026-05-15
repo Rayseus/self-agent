@@ -1,0 +1,61 @@
+# GitHub Actions：远程触发知识库 ingest
+#
+# 触发条件：
+#   1. push 到 main 且 data/**.md 变更时自动跑
+#   2. workflow_dispatch 任意分支手动触发（用于改 ingest 脚本本身后回归）
+#
+# 前置条件：
+#   - 在仓库 Settings → Secrets and variables → Actions 配置：
+#       DATABASE_URL_EXTERNAL  ← Render PostgreSQL 的 External Database URL
+#       GEMINI_API_KEY         ← Gemini API key
+#   - Render PostgreSQL 的 ipAllowList 必须放开外部访问（已在 render.yaml 配置 0.0.0.0/0）
+
+name: ingest
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/**"
+      - "backend/scripts/ingest.py"
+      - ".github/workflows/ingest.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ingest-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL_EXTERNAL }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      PROXY_URL: ""
+      APP_ENV: prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.9"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install backend deps
+        run: pip install -r backend/requirements.txt
+
+      - name: Run ingest
+        working-directory: backend
+        run: python -m scripts.ingest
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Ingest result" >> "$GITHUB_STEP_SUMMARY"
+          echo "- ref: \`${{ github.ref }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- commit: \`${{ github.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- status: \`${{ job.status }}\`" >> "$GITHUB_STEP_SUMMARY"

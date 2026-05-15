@@ -3,7 +3,11 @@ databases:
     plan: free
     databaseName: self_agent
     postgresMajorVersion: "16"
-    ipAllowList: []
+    # 允许外部连接，让 GitHub Actions 远程触发 ingest（见 .github/workflows/ingest.yml）。
+    # 数据库账号 / 密码仍由 Render 颁发，外部访问仍需正确凭证。
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: GitHub Actions (ingest)
 
 services:
   - type: web
