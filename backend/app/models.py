@@ -56,7 +56,21 @@ class QALog(Base):
     question: Mapped[str] = mapped_column(Text, nullable=False)
     answer: Mapped[str] = mapped_column(Text, nullable=False)
     trace_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    session_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    client_ip: Mapped[str | None] = mapped_column(String(45), nullable=True)
     latency_ms: Mapped[float | None] = mapped_column(nullable=True)
     hit_chunks: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     retrieval_scores: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class QADailySummary(Base):
+    __tablename__ = "qa_daily_summary"
+
+    day = mapped_column(DateTime, primary_key=True)
+    total_questions: Mapped[int] = mapped_column(Integer, nullable=False)
+    unique_sessions: Mapped[int] = mapped_column(Integer, nullable=False)
+    unique_ips: Mapped[int] = mapped_column(Integer, nullable=False)
+    avg_latency_ms: Mapped[float | None] = mapped_column(nullable=True)
+    top_questions: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    generated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

@@ -40,8 +40,21 @@ CREATE TABLE IF NOT EXISTS qa_logs (
   question TEXT NOT NULL,
   answer TEXT NOT NULL,
   trace_id VARCHAR(64) NOT NULL,
+  session_id VARCHAR(64),
+  client_ip INET,
   latency_ms DOUBLE PRECISION,
   hit_chunks JSONB,
   retrieval_scores JSONB,
   created_at TIMESTAMP DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_qa_logs_created_at ON qa_logs (created_at);
+
+CREATE TABLE IF NOT EXISTS qa_daily_summary (
+  day DATE PRIMARY KEY,
+  total_questions INT NOT NULL,
+  unique_sessions INT NOT NULL,
+  unique_ips INT NOT NULL,
+  avg_latency_ms DOUBLE PRECISION,
+  top_questions JSONB,
+  generated_at TIMESTAMP DEFAULT NOW()
 );

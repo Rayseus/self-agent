@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     embedding_dim: int = 3072
     proxy_url: str = ""
     cors_origins: str = "http://localhost:5173"
+    admin_token: str = ""
 
 
 settings = Settings()

@@ -1,0 +1,54 @@
+# GitHub Actions：每日自动聚合 qa_logs 统计
+#
+# 触发条件：
+#   1. schedule: 每日 00:10 UTC 自动执行
+#   2. workflow_dispatch: 手动触发（可指定日期）
+#
+# 前置条件：
+#   - 在仓库 Settings → Secrets and variables → Actions 配置：
+#       RENDER_API_BASE   ← 后端 API 地址（如 https://self-agent-api.onrender.com）
+#       ADMIN_TOKEN       ← 与后端 ADMIN_TOKEN 环境变量一致
+
+name: daily-aggregate
+
+on:
+  schedule:
+    - cron: "10 0 * * *"
+  workflow_dispatch:
+    inputs:
+      day:
+        description: "聚合日期 (YYYY-MM-DD), 留空则为昨天"
+        required: false
+
+jobs:
+  aggregate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Determine day
+        id: day
+        run: |
+          if [ -n "${{ github.event.inputs.day }}" ]; then
+            echo "value=${{ github.event.inputs.day }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=$(date -u -d 'yesterday' '+%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Call aggregate endpoint
+        run: |
+          HTTP_CODE=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            -X POST "${{ secrets.RENDER_API_BASE }}/admin/aggregate?day=${{ steps.day.outputs.value }}" \
+            -H "X-Admin-Token: ${{ secrets.ADMIN_TOKEN }}")
+          echo "HTTP status: $HTTP_CODE"
+          cat /tmp/response.json
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Aggregate failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Daily Aggregate" >> "$GITHUB_STEP_SUMMARY"
+          echo "- day: \`${{ steps.day.outputs.value }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- status: \`${{ job.status }}\`" >> "$GITHUB_STEP_SUMMARY"
