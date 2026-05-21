@@ -1,3 +1,4 @@
+import json
 import logging
 from collections import Counter
 from datetime import date
@@ -45,7 +46,7 @@ def aggregate_daily(day: date) -> dict:
         session.execute(
             text("""
                 INSERT INTO qa_daily_summary (day, total_questions, unique_sessions, unique_ips, avg_latency_ms, top_questions, generated_at)
-                VALUES (:day, :total, :sessions, :ips, :avg_lat, :top::jsonb, NOW())
+                VALUES (:day, :total, :sessions, :ips, :avg_lat, CAST(:top AS jsonb), NOW())
                 ON CONFLICT (day) DO UPDATE SET
                     total_questions = EXCLUDED.total_questions,
                     unique_sessions = EXCLUDED.unique_sessions,
@@ -54,7 +55,7 @@ def aggregate_daily(day: date) -> dict:
                     top_questions = EXCLUDED.top_questions,
                     generated_at = NOW()
             """),
-            {"day": day, "total": total, "sessions": sessions, "ips": ips, "avg_lat": avg_lat, "top": __import__("json").dumps(top, ensure_ascii=False)},
+            {"day": day, "total": total, "sessions": sessions, "ips": ips, "avg_lat": avg_lat, "top": json.dumps(top, ensure_ascii=False)},
         )
         session.commit()
         return {"day": str(day), "total_questions": total, "unique_sessions": sessions, "unique_ips": ips, "avg_latency_ms": avg_lat, "top_questions": top}
